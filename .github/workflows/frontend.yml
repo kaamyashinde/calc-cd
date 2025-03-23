@@ -1,4 +1,4 @@
-name: build-test-deploy-frontend
+name: Frontend
 
 on:
   push:
