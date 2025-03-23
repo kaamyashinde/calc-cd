@@ -34,11 +34,12 @@ jobs:
         working-directory: calculator-frontend
         run: npm run build
 
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v3
+      - name: Upload test coverage
+        uses: actions/upload-artifact@v4
         with:
-          name: frontend-dist
-          path: calculator-frontend/dist
+          name: coverage
+          path: calculator-frontend/coverage/
+
 
   test-frontend:
     runs-on: ubuntu-latest
