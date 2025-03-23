@@ -1,21 +1,26 @@
-name: Frontend CI/CD
+name: build-test-deploy-frontend
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: 18
 
 jobs:
-  build-test-deploy:
+  build-frontend:
     runs-on: ubuntu-latest
-
+    name: Build frontend
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Install dependencies
         working-directory: calculator-frontend
@@ -25,19 +30,71 @@ jobs:
         working-directory: calculator-frontend
         run: npm run format
 
+      - name: Build
+        working-directory: calculator-frontend
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-dist
+          path: calculator-frontend/dist
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    name: Test frontend
+    needs: build-frontend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        working-directory: calculator-frontend
+        run: npm install
+
       - name: Run unit tests
         working-directory: calculator-frontend
         run: npm run test:unit
 
-      - name: Build frontend
+      - name: Upload test coverage
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage
+          path: calculator-frontend/coverage/
+
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    name: Deploy frontend to Netlify
+    needs: test-frontend
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install Netlify CLI
+        run: npm install -g netlify-cli
+
+      - name: Install dependencies
+        working-directory: calculator-frontend
+        run: npm install
+
+      - name: Build
         working-directory: calculator-frontend
         run: npm run build
 
       - name: Deploy to Netlify
+        working-directory: calculator-frontend
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        working-directory: calculator-frontend
-        run: |
-          npm install -g netlify-cli
-          netlify deploy --prod --dir=dist --site=$NETLIFY_SITE_ID
+        run: netlify deploy --prod --dir=dist --auth $NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID
