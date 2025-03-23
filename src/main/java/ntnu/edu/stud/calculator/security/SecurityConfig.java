@@ -26,17 +26,17 @@ public class SecurityConfig {
             // Deaktiver CSRF (ikke nødvendig for API-er)
             .csrf(csrf -> csrf.disable())
             
-            // Konfigurer CORS (tillat frontend med offentlig IP)
+            // Configure CORS
             .cors(cors -> cors.configurationSource(request -> {
                 CorsConfiguration config = new CorsConfiguration();
                 config.setAllowedOrigins(Arrays.asList(
-                    "http://localhost:5173",  // Lokalt utviklingsmiljø
-                    "http://localhost:5170",  
-                    "http://128.251.48.227:8081"  // Offentlig frontend-IP
+                    "http://localhost:5173",  // Local development
+                    "http://localhost:5170",
+                    "https://fabulous-torte-5b3d63.netlify.app"  // Production frontend
                 ));
                 config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                 config.setAllowedHeaders(Arrays.asList("*"));
-                config.setAllowCredentials(true); // Tillat autentiseringstokens og cookies
+                config.setAllowCredentials(true);
                 return config;
             }))
             
