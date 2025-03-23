@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import axios from 'axios'
 import { saveUserInfo } from './userInfo'
+import { API_BASE_URL } from '../config'
 
 export const useCalculatorStore = defineStore('calculator', () => {
   // State
@@ -84,7 +85,7 @@ export const useCalculatorStore = defineStore('calculator', () => {
         expression: expression,
       }
       console.log('Sending expression to backend:', payload)
-      const response = await axios.post('http://localhost:5170/api/calculate', payload, {
+      const response = await axios.post(`${API_BASE_URL}/api/calculate`, payload, {
         headers: {
           Authorization: `Bearer ${userInfo.savedToken}`,
         },
@@ -95,7 +96,7 @@ export const useCalculatorStore = defineStore('calculator', () => {
 
       // Refresh history after calculation
       try {
-        const historyResponse = await axios.get('http://localhost:5170/api/history', {
+        const historyResponse = await axios.get(`${API_BASE_URL}/api/history`, {
           headers: {
             Authorization: `Bearer ${userInfo.savedToken}`,
           },
