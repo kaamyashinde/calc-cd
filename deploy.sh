@@ -6,7 +6,7 @@ echo "Building the application..."
 
 # Deploy to Heroku
 echo "Deploying to Heroku..."
-heroku deploy:jar target/calculator-backend-0.0.1-SNAPSHOT.jar --app calculator-cd-backend
+heroku deploy:jar target/calculator-backend-0.0.1-SNAPSHOT.jar --app calc-cd
 
 echo "Deployment completed!"
 
