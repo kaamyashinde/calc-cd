@@ -1,0 +1,35 @@
+name: Build & Deploy to Heroku (Spring Boot Docker)
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Build Spring Boot JAR
+        working-directory: calculator-backend
+        run: mvn clean package -DskipTests
+
+      - name: Install Heroku CLI
+        run: |
+          curl https://cli-assets.heroku.com/install.sh | sh
+          ./heroku/bin/heroku container:login
+
+      - name: Push Docker container to Heroku
+        run: |
+          ./heroku/bin/heroku container:push web --app ${{ secrets.HEROKU_APP_NAME }} --context-path calculator-backend
+          ./heroku/bin/heroku container:release web --app ${{ secrets.HEROKU_APP_NAME }}
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
