@@ -6,6 +6,7 @@ import { saveUserInfo } from '@/stores/userInfo'
 import { useCalculatorStore } from '@/stores/calculatorStore'
 import axios from 'axios'
 import { ref } from 'vue'
+import { API_BASE_URL } from '@/config'
 
 export default {
   setup(props, ctx) {
@@ -33,7 +34,7 @@ export default {
       console.log('sending data to server...')
       loginError.value = ''
       try {
-        const response = await axios.post('http://128.251.48.227:8080/auth/login', values)
+        const response = await axios.post(`${API_BASE_URL}/auth/login`, values)
         console.log('Login successful')
         console.log(response.data)
         console.log(response.data.user)
@@ -63,11 +64,7 @@ export default {
       console.log('Retrieving history from the server...')
       try {
         const response = await axios.get(
-          'http://localhost:8080/api/history?username=' +
-            username +
-            '&password=' +
-            password +
-            '&page=0&size=10',
+          `${API_BASE_URL}/api/history?username=${username}&password=${password}&page=0&size=10`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

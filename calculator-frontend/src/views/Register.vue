@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router'
 import { saveUserInfo } from '@/stores/userInfo'
 import axios from 'axios'
 import { ref } from 'vue'
+import { API_BASE_URL } from '@/config'
 
 export default {
   setup(props, ctx) {
@@ -31,7 +32,7 @@ export default {
       console.log('sending data to server...')
       registrationError.value = '' // Clear any previous error
       try {
-        const response = await axios.post('http://128.251.48.227:8080/auth/register', values)
+        const response = await axios.post(`${API_BASE_URL}/auth/register`, values)
         console.log('Registration successful')
         store.setUserInfo(
           response.data.user.username,
