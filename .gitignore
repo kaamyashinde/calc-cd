@@ -1,0 +1,29 @@
+# Frontend
+calculator-frontend/node_modules
+calculator-frontend/dist
+calculator-frontend/.env
+calculator-frontend/.env.*
+calculator-frontend/coverage
+calculator-frontend/*.local
+
+# Backend
+calculator-backend/.mvn/
+calculator-backend/!.mvn/wrapper/maven-wrapper.jar
+calculator-backend/!**/src/main/**/target/
+calculator-backend/!**/src/test/**/target/
+
+# IDE files
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS files
+.DS_Store
+Thumbs.db 

@@ -1,0 +1,6 @@
+2025-03-08 13:00:23.694019+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "APP_USERS" not found (this database is empty); SQL statement:
+select u1_0.id,u1_0.password,u1_0.username from app_users u1_0 where u1_0.username is null [42104-232]
+2025-03-08 14:28:31.222777+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "APP_USERS" not found (this database is empty); SQL statement:
+select u1_0.id,u1_0.password,u1_0.username from app_users u1_0 where u1_0.username=? [42104-232]

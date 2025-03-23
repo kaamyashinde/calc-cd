@@ -1,0 +1,113 @@
+stages:
+  - build-backend
+  - build-frontend
+  - test
+  - package
+  - deploy
+
+before_script:
+  - rm -f .git/shallow.lock
+  - git fetch --unshallow || true
+
+# ========================
+# Backend (Spring Boot)
+# ========================
+
+build-backend:
+  image: maven:3.9.6-eclipse-temurin-21
+  stage: build-backend
+  script:
+    - cd calculator-backend
+    - mvn clean compile
+  artifacts:
+    paths:
+      - calculator-backend/target/
+
+test-backend:
+  image: maven:3.9.6-eclipse-temurin-21
+  stage: test
+  script:
+    - cd calculator-backend
+    - mvn test
+  artifacts:
+    paths:
+      - calculator-backend/target/surefire-reports/
+
+package-backend:
+  image: maven:3.9.6-eclipse-temurin-21
+  stage: package
+  script:
+    - cd calculator-backend
+    - mvn package -DskipTests
+  artifacts:
+    paths:
+      - calculator-backend/target/*.jar
+
+# ========================
+# Frontend (Vue)
+# ========================
+
+build-frontend:
+  image: node:18
+  stage: build-frontend
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - calculator-frontend/node_modules/
+  script:
+    - cd calculator-frontend
+    - npm install
+    - npm run format
+    - npm run build
+  artifacts:
+    paths:
+      - calculator-frontend/dist/
+      - calculator-frontend/node_modules/
+
+test-frontend:
+  image: node:18
+  stage: test
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - calculator-frontend/node_modules/
+  script:
+    - cd calculator-frontend
+    - npm run test:unit
+  artifacts:
+    paths:
+      - calculator-frontend/coverage/
+
+package-frontend:
+  image: node:18
+  stage: package
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - calculator-frontend/node_modules/
+  before_script:
+    - rm -f .git/shallow.lock
+    - git fetch --unshallow || true
+  script:
+    - cd calculator-frontend
+    - npm run build
+  artifacts:
+    paths:
+      - calculator-frontend/dist/
+    expire_in: 1 week
+
+# ========================
+# Deploy til Netlify
+# ========================
+
+deploy-frontend:
+  image: node:18
+  stage: deploy
+  dependencies:
+    - package-frontend
+  script:
+    - npm install -g netlify-cli
+    - cd calculator-frontend
+    - netlify deploy --prod --dir=dist --auth $NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID
+  only:
+    - main
